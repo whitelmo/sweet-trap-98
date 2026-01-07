@@ -5,7 +5,6 @@ import { AttackFeed } from "@/components/dashboard/AttackFeed";
 import { HoneypotStatus } from "@/components/dashboard/HoneypotStatus";
 import { AttackChart } from "@/components/dashboard/AttackChart";
 import { TopAttackers } from "@/components/dashboard/TopAttackers";
-import { ThreatMap } from "@/components/dashboard/ThreatMap";
 
 const Index = () => {
   return (
@@ -51,10 +50,7 @@ const Index = () => {
         {/* Main Content Grid */}
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <AttackFeed />
-          <div className="space-y-6">
-            <TopAttackers />
-            <ThreatMap />
-          </div>
+          <TopAttackers />
         </div>
 
         {/* Honeypot Status */}

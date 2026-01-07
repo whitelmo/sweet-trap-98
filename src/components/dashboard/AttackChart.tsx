@@ -16,11 +16,11 @@ const timeSeriesData = [
 ];
 
 const attackTypeData = [
-  { name: "SSH Brute Force", value: 35, color: "hsl(0, 85%, 55%)" },
-  { name: "SQL Injection", value: 25, color: "hsl(35, 100%, 50%)" },
-  { name: "Port Scanning", value: 20, color: "hsl(170, 100%, 50%)" },
-  { name: "XSS Attacks", value: 12, color: "hsl(280, 80%, 60%)" },
-  { name: "Other", value: 8, color: "hsl(220, 15%, 40%)" },
+  { name: "SSH Brute Force", value: 35, count: 13642, color: "hsl(0, 85%, 55%)" },
+  { name: "SQL Injection", value: 25, count: 9744, color: "hsl(35, 100%, 50%)" },
+  { name: "Port Scanning", value: 20, count: 7795, color: "hsl(170, 100%, 50%)" },
+  { name: "XSS Attacks", value: 12, count: 4677, color: "hsl(280, 80%, 60%)" },
+  { name: "Other", value: 8, count: 3118, color: "hsl(220, 15%, 40%)" },
 ];
 
 export function AttackChart() {
@@ -118,10 +118,14 @@ export function AttackChart() {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(220, 20%, 8%)",
-                  border: "1px solid hsl(220, 15%, 15%)",
+                  backgroundColor: "hsl(0, 0%, 100%)",
+                  border: "1px solid hsl(214, 32%, 91%)",
                   borderRadius: "8px",
-                  color: "hsl(180, 100%, 95%)",
+                  color: "hsl(222, 47%, 11%)",
+                }}
+                formatter={(value: number, name: string, props: any) => {
+                  const item = attackTypeData.find(d => d.name === props.payload.name);
+                  return [`${item?.count?.toLocaleString() || 0} attacks`, props.payload.name];
                 }}
               />
             </PieChart>
