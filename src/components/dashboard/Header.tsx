@@ -1,4 +1,4 @@
-import { Shield, Bell, Settings, RefreshCw, Lock, Database, Eye, ShieldAlert, Terminal, FileWarning, AlertTriangle, CheckCircle, Users, Key, Clock, Trash2, Mail, Webhook, Download, FileText, ChevronRight, Plus, Edit, X } from "lucide-react";
+import { Shield, Bell, Settings, RefreshCw, Lock, Database, Eye, ShieldAlert, Terminal, FileWarning, AlertTriangle, CheckCircle, Users, Key, Clock, Trash2, Mail, Webhook, Download, FileText, ChevronRight, Plus, Edit, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const notifications = [
   { id: 1, type: "critical", title: "Brute Force Attack Detected", message: "192.168.1.45 attempted 1,247 login attempts", time: "2 min ago", icon: ShieldAlert },
@@ -114,6 +116,8 @@ const mockWebhooks = [
 ];
 
 export function Header() {
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeSettings, setActiveSettings] = useState<SettingsKey | null>(null);
   const [activeSubConfig, setActiveSubConfig] = useState<SettingsItemConfig | null>(null);
@@ -139,6 +143,14 @@ export function Header() {
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => setIsRefreshing(false), 1000);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
   };
 
   const handleToggle = (label: string) => {
@@ -532,6 +544,28 @@ export function Header() {
                     </button>
                   ))}
                 </div>
+              </PopoverContent>
+            </Popover>
+            {/* Logout Button */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex h-9 items-center gap-2 px-3 rounded-lg border border-border bg-secondary transition-colors hover:bg-secondary/80">
+                  <span className="text-xs text-muted-foreground max-w-[120px] truncate hidden sm:block">{user?.email}</span>
+                  <LogOut className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-2" align="end">
+                <div className="mb-2 px-2 py-1.5 border-b border-border">
+                  <p className="text-sm font-medium truncate">{user?.email}</p>
+                  <p className="text-xs text-muted-foreground">Logged in</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-md p-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign out
+                </button>
               </PopoverContent>
             </Popover>
           </div>
