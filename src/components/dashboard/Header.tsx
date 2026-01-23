@@ -116,9 +116,17 @@ const mockWebhooks = [
 ];
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, role } = useAuth();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const getRoleBadgeColor = (role: string | null) => {
+    switch (role) {
+      case 'admin': return 'bg-destructive/20 text-destructive border-destructive/30';
+      case 'analyst': return 'bg-primary/20 text-primary border-primary/30';
+      default: return 'bg-muted text-muted-foreground border-border';
+    }
+  };
   const [activeSettings, setActiveSettings] = useState<SettingsKey | null>(null);
   const [activeSubConfig, setActiveSubConfig] = useState<SettingsItemConfig | null>(null);
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
@@ -546,18 +554,36 @@ export function Header() {
                 </div>
               </PopoverContent>
             </Popover>
-            {/* Logout Button */}
+            {/* User Profile & Logout */}
             <Popover>
               <PopoverTrigger asChild>
                 <button className="flex h-9 items-center gap-2 px-3 rounded-lg border border-border bg-secondary transition-colors hover:bg-secondary/80">
                   <span className="text-xs text-muted-foreground max-w-[120px] truncate hidden sm:block">{user?.email}</span>
+                  {role && (
+                    <span className={cn(
+                      "text-[10px] font-medium px-1.5 py-0.5 rounded border capitalize hidden md:block",
+                      getRoleBadgeColor(role)
+                    )}>
+                      {role}
+                    </span>
+                  )}
                   <LogOut className="h-4 w-4 text-muted-foreground" />
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-56 p-2" align="end">
                 <div className="mb-2 px-2 py-1.5 border-b border-border">
                   <p className="text-sm font-medium truncate">{user?.email}</p>
-                  <p className="text-xs text-muted-foreground">Logged in</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {role && (
+                      <span className={cn(
+                        "text-[10px] font-medium px-1.5 py-0.5 rounded border capitalize",
+                        getRoleBadgeColor(role)
+                      )}>
+                        {role}
+                      </span>
+                    )}
+                    <p className="text-xs text-muted-foreground">Logged in</p>
+                  </div>
                 </div>
                 <button
                   onClick={handleLogout}
