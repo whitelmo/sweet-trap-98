@@ -10,7 +10,7 @@ import { TopAttackers } from "@/components/dashboard/TopAttackers";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, hasRole } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,16 +73,33 @@ const Index = () => {
           <AttackChart />
         </div>
 
-        {/* Main Content Grid */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <AttackFeed />
-          <TopAttackers />
-        </div>
+        {/* Main Content Grid - Analysts and Admins only */}
+        {hasRole('analyst') && (
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <AttackFeed />
+            <TopAttackers />
+          </div>
+        )}
 
-        {/* Honeypot Status */}
-        <div className="mt-6">
-          <HoneypotStatus />
-        </div>
+        {/* Viewer notice for limited access */}
+        {!hasRole('analyst') && (
+          <div className="mt-6 rounded-lg border border-border bg-card p-6">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Shield className="h-5 w-5" />
+              <div>
+                <p className="font-medium text-foreground">Limited Access</p>
+                <p className="text-sm">Contact an administrator to upgrade your role for full dashboard access including live attack feeds and detailed threat analysis.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Honeypot Status - Analysts and Admins only */}
+        {hasRole('analyst') && (
+          <div className="mt-6">
+            <HoneypotStatus />
+          </div>
+        )}
       </main>
 
       {/* Footer */}

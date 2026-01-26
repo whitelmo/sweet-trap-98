@@ -116,7 +116,7 @@ const mockWebhooks = [
 ];
 
 export function Header() {
-  const { user, signOut, role } = useAuth();
+  const { user, signOut, role, hasRole } = useAuth();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   
@@ -127,6 +127,17 @@ export function Header() {
       default: return 'bg-muted text-muted-foreground border-border';
     }
   };
+  
+  // Admin-only settings categories
+  const adminOnlySettings = ['access', 'api'];
+  
+  // Filter settings based on role
+  const filteredSettingsOptions = settingsOptions.filter(option => {
+    if (adminOnlySettings.includes(option.key)) {
+      return hasRole('admin');
+    }
+    return hasRole('analyst'); // Analysts and admins can see other settings
+  });
   const [activeSettings, setActiveSettings] = useState<SettingsKey | null>(null);
   const [activeSubConfig, setActiveSubConfig] = useState<SettingsItemConfig | null>(null);
   const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
@@ -523,37 +534,39 @@ export function Header() {
               </PopoverContent>
             </Popover>
 
-            {/* Settings Popover */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary transition-colors hover:bg-secondary/80">
-                  <Settings className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 p-0" align="end">
-                <div className="border-b border-border p-3">
-                  <h3 className="font-semibold">Settings</h3>
-                  <p className="text-xs text-muted-foreground">Security configuration</p>
-                </div>
-                <div className="p-1">
-                  {settingsOptions.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveSettings(option.key as SettingsKey)}
-                      className="flex w-full items-center gap-3 rounded-md p-2 hover:bg-muted/50 transition-colors text-left"
-                    >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                        <option.icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{option.label}</p>
-                        <p className="text-xs text-muted-foreground">{option.description}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+            {/* Settings Popover - Only visible to analysts and admins */}
+            {hasRole('analyst') && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary transition-colors hover:bg-secondary/80">
+                    <Settings className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-0" align="end">
+                  <div className="border-b border-border p-3">
+                    <h3 className="font-semibold">Settings</h3>
+                    <p className="text-xs text-muted-foreground">Security configuration</p>
+                  </div>
+                  <div className="p-1">
+                    {filteredSettingsOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setActiveSettings(option.key as SettingsKey)}
+                        className="flex w-full items-center gap-3 rounded-md p-2 hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                          <option.icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{option.label}</p>
+                          <p className="text-xs text-muted-foreground">{option.description}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
             {/* User Profile & Logout */}
             <Popover>
               <PopoverTrigger asChild>
