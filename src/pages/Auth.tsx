@@ -9,13 +9,27 @@ import { Shield, Eye, EyeOff, Lock, Mail, User, AlertTriangle, ArrowLeft, KeyRou
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
+// Strong password validation with complexity requirements
+const passwordSchema = z.string()
+  .min(8, { message: "Password must be at least 8 characters" })
+  .max(128, { message: "Password must be less than 128 characters" })
+  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+  .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+  .regex(/[0-9]/, { message: "Password must contain at least one number" });
+
 const loginSchema = z.object({
-  email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  password: z.string().min(1, { message: "Password is required" }).max(128, { message: "Password must be less than 128 characters" }),
 });
 
-const signupSchema = loginSchema.extend({
-  fullName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
+const signupSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  password: passwordSchema,
+  fullName: z.string()
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(100, { message: "Name must be less than 100 characters" })
+    .regex(/^[a-zA-Z\s\-']+$/, { message: "Name can only contain letters, spaces, hyphens, and apostrophes" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -23,11 +37,11 @@ const signupSchema = loginSchema.extend({
 });
 
 const resetSchema = z.object({
-  email: z.string().trim().email({ message: "Invalid email address" }),
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
 });
 
 const newPasswordSchema = z.object({
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  password: passwordSchema,
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
