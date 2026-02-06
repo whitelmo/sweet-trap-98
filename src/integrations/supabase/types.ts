@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      honeypot_logs: {
+        Row: {
+          attack_type: string | null
+          created_at: string
+          honeypot_name: string
+          honeypot_type: string
+          id: string
+          metadata: Json | null
+          payload: string | null
+          protocol: string | null
+          source_ip: string
+          source_port: number | null
+          timestamp: string
+        }
+        Insert: {
+          attack_type?: string | null
+          created_at?: string
+          honeypot_name: string
+          honeypot_type: string
+          id?: string
+          metadata?: Json | null
+          payload?: string | null
+          protocol?: string | null
+          source_ip: string
+          source_port?: number | null
+          timestamp?: string
+        }
+        Update: {
+          attack_type?: string | null
+          created_at?: string
+          honeypot_name?: string
+          honeypot_type?: string
+          id?: string
+          metadata?: Json | null
+          payload?: string | null
+          protocol?: string | null
+          source_ip?: string
+          source_port?: number | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
