@@ -1,1 +1,4 @@
 project_id = "epyevtqmopcvjjhnaqyk"
+
+[functions.honeypot-ingest]
+verify_jwt = false
