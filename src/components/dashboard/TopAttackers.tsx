@@ -1,22 +1,6 @@
-import { Globe, Ban } from "lucide-react";
+import { Globe, Ban, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface Attacker {
-  ip: string;
-  country: string;
-  attacks: number;
-  lastSeen: string;
-  threatScore: number;
-  blocked: boolean;
-}
-
-const attackers: Attacker[] = [
-  { ip: "185.220.101.34", country: "Russia", attacks: 4521, lastSeen: "2 min ago", threatScore: 95, blocked: true },
-  { ip: "45.155.205.233", country: "Netherlands", attacks: 3892, lastSeen: "5 min ago", threatScore: 88, blocked: true },
-  { ip: "194.26.29.113", country: "Ukraine", attacks: 2847, lastSeen: "12 min ago", threatScore: 76, blocked: false },
-  { ip: "91.240.118.172", country: "Russia", attacks: 2156, lastSeen: "18 min ago", threatScore: 82, blocked: true },
-  { ip: "23.129.64.130", country: "United States", attacks: 1923, lastSeen: "25 min ago", threatScore: 71, blocked: true },
-];
+import { useHoneypotLogs } from "@/hooks/useHoneypotLogs";
 
 const getThreatColor = (score: number) => {
   if (score >= 90) return "text-destructive";
@@ -31,6 +15,36 @@ const getThreatBarColor = (score: number) => {
 };
 
 export function TopAttackers() {
+  const { topAttackers, isLoading } = useHoneypotLogs();
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border p-4">
+          <h3 className="font-semibold">Top Attacking IPs</h3>
+        </div>
+        <div className="p-8 flex items-center justify-center text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin mr-2" />
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  if (topAttackers.length === 0) {
+    return (
+      <div className="rounded-lg border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border p-4">
+          <h3 className="font-semibold">Top Attacking IPs</h3>
+        </div>
+        <div className="p-8 text-center text-muted-foreground">
+          <Globe className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p>No attackers detected yet</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="flex items-center justify-between border-b border-border p-4">
@@ -41,7 +55,7 @@ export function TopAttackers() {
       </div>
       
       <div className="divide-y divide-border">
-        {attackers.map((attacker, index) => (
+        {topAttackers.map((attacker, index) => (
           <div
             key={attacker.ip}
             className="flex items-center gap-4 p-4 transition-colors hover:bg-secondary/50"
@@ -53,14 +67,12 @@ export function TopAttackers() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-sm font-medium">{attacker.ip}</span>
-                {attacker.blocked && (
+                {attacker.threatScore >= 80 && (
                   <Ban className="h-3.5 w-3.5 text-destructive" />
                 )}
               </div>
               <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                 <Globe className="h-3 w-3" />
-                <span>{attacker.country}</span>
-                <span>•</span>
                 <span>{attacker.lastSeen}</span>
               </div>
             </div>

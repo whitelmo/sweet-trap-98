@@ -8,9 +8,11 @@ import { HoneypotStatus } from "@/components/dashboard/HoneypotStatus";
 import { AttackChart } from "@/components/dashboard/AttackChart";
 import { TopAttackers } from "@/components/dashboard/TopAttackers";
 import { useAuth } from "@/hooks/useAuth";
+import { useHoneypotLogs } from "@/hooks/useHoneypotLogs";
 
 const Index = () => {
   const { user, loading, hasRole } = useAuth();
+  const { stats } = useHoneypotLogs();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,29 +44,29 @@ const Index = () => {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="Total Attacks (24h)"
-            value="38,429"
+            value={stats.totalAttacks24h.toLocaleString()}
             icon={AlertTriangle}
             variant="threat"
-            trend={{ value: 12.5, isPositive: false }}
+            trend={stats.totalAttacks24h > 0 ? { value: 12.5, isPositive: false } : undefined}
           />
           <MetricCard
             title="Blocked Threats"
-            value="37,892"
+            value={stats.blockedThreats.toLocaleString()}
             icon={Shield}
             variant="success"
-            trend={{ value: 8.2, isPositive: true }}
+            trend={stats.blockedThreats > 0 ? { value: 8.2, isPositive: true } : undefined}
           />
           <MetricCard
             title="Active Honeypots"
-            value="5/6"
+            value={`${stats.activeHoneypots}/${stats.totalHoneypots}`}
             icon={Server}
             variant="default"
           />
           <MetricCard
             title="Threat Level"
-            value="HIGH"
+            value={stats.threatLevel}
             icon={Activity}
-            variant="warning"
+            variant={stats.threatLevel === 'CRITICAL' ? 'threat' : stats.threatLevel === 'HIGH' ? 'warning' : 'default'}
           />
         </div>
 
